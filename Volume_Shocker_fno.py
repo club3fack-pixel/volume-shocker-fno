@@ -7,11 +7,15 @@ from tabulate import tabulate
 import requests
 import warnings
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
 warnings.filterwarnings("ignore")
 
 # ==================== TELEGRAM CONFIGURATION ====================
-TELEGRAM_BOT_TOKEN = "7770995517:AAFlM9YRAAckuKu7c-uBoR5_2srzj_uUzH8"
-TELEGRAM_CHAT_ID = "6088684927"
+# This will automatically use GitHub Secrets when running on GitHub Actions
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN') or "7770995517:AAFlM9YRAAckuKu7c-uBoR5_2srzj_uUzH8"
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID') or "6088684927"
+
+print(f"📡 Telegram Mode: {'✅ GitHub Secrets' if os.getenv('TELEGRAM_BOT_TOKEN') else '🔸 Local Hardcoded'}")
 
 # ==================== BTST STRATEGY PARAMETERS ====================
 VOLUME_SURGE_THRESHOLD = 50  # Volume surge threshold in percentage
@@ -121,7 +125,6 @@ class TelegramNotifier:
 
 """
                 
-                # Add volume shocker signals
                 if not signals_df.empty:
                     buy_signals = signals_df[signals_df['Signal'] == 'BUY']
                     sell_signals = signals_df[signals_df['Signal'] == 'SELL']
@@ -145,7 +148,6 @@ class TelegramNotifier:
 
 """
                 
-                # Add short sell signals
                 if short_sell_df is not None and not short_sell_df.empty:
                     message += f"""🎯 SHORT SELL SIGNALS (Open=High & RSI<20):
 • Total: {len(short_sell_df)}
@@ -178,7 +180,7 @@ class TelegramNotifier:
             
             url = f"https://api.telegram.org/bot{self.bot_token}/sendMessage"
             payload = {'chat_id': self.chat_id, 'text': message, 'disable_web_page_preview': True}
-            response = requests.post(url, json=payload, timeout=10)
+            response = requests.post(url, json=payload, timeout=15)
             return response.status_code == 200
         except Exception as e:
             print(f"❌ Telegram error: {str(e)[:100]}")
@@ -791,7 +793,7 @@ def main():
 ║  • Daily Open = Daily High (Bearish reversal signal)                ║
 ║                                                                      ║
 ║  BATCH PROCESSING:                                                  ║
-║  ✓ {BATCH_SIZE} stocks per batch | {MAX_WORKERS} parallel threads   ║
+║  ✓ 30 stocks per batch | 20 parallel threads                        ║
 ║  ✓ Telegram alerts for all signals                                  ║
 ║                                                                      ║
 ╚══════════════════════════════════════════════════════════════════════╝
