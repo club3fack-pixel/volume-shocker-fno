@@ -21,15 +21,26 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install dependencies
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-dev libssl-dev libxml2-dev libxslt1-dev
+
+    - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install wheel setuptools
+        if [ -f requirements.txt ]; then 
+          pip install -r requirements.txt --no-cache-dir
+        else
+          echo "No requirements.txt found!"
+        fi
 
     - name: Run Volume Shocker Script
       run: python Volume_Shocker_fno.py
       env:
-        API_KEY: ${{ secrets.API_KEY }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
     - name: Commit and Push Output Files
       if: always()
@@ -40,21 +51,20 @@ jobs:
         if git diff --staged --quiet; then
           echo "No changes to commit"
         else
-          git commit -m "Update Volume Shocker outputs - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          git commit -m "Update outputs - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
           git push
         fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Send Telegram Notification
-      if: always()   # Sends message on success and failure
+      if: always()
       run: |
         if [ "${{ job.status }}" = "success" ]; then
-          MESSAGE="✅ Volume Shocker FNO Ran Successfully"
+          MSG="✅ Volume Shocker FNO Completed Successfully"
         else
-          MESSAGE="❌ Volume Shocker FNO Failed"
+          MSG="❌ Volume Shocker FNO Failed"
         fi
-        
         curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
           -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-          -d text="$MESSAGE at $(date -u +'%Y-%m-%d %H:%M:%S UTC')%0A%0A🔗 Check Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          -d text="$MSG%0A Time: $(date -u +'%Y-%m-%d %H:%M:%S UTC')%0A🔗 Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
