@@ -1,12 +1,5 @@
 pandas
 numpy
-requests
-openpyxl
 yfinance
-nsepython
-nselib
-pandas-ta
-beautifulsoup4
-lxml
-python-dotenv
-schedule
+requests
+tabulate
