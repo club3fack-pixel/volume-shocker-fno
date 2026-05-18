@@ -17,10 +17,10 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
-        python-version: '3.12'     # ← Changed to 3.12
+        python-version: '3.12'
 
     - name: Install System Packages
-      run: sudo apt-get update && sudo apt-get install -y python3-dev libxml2-dev libxslt1-dev
+      run: sudo apt-get update && sudo apt-get install -y python3-dev libxml2-dev
 
     - name: Install Python dependencies
       run: |
