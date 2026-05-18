@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '55 3 * * *'    # 9:25 AM IST
     - cron: '45 9 * * *'    # 3:15 PM IST
-  workflow_dispatch:        # Allows manual trigger from GitHub
+  workflow_dispatch:        # Manual trigger
 
 jobs:
   run-script:
@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Setup Python
       uses: actions/setup-python@v5
@@ -26,3 +28,38 @@ jobs:
 
     - name: Run Volume Shocker Script
       run: python Volume_Shocker_fno.py
+      env:
+        # Add any API keys or secrets here if your script needs them
+        API_KEY: ${{ secrets.API_KEY }}
+
+    - name: Commit and Push Output Files
+      if: always()                    # Run even if script fails
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add -A
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update Volume Shocker outputs - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          git push
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Send Failure Notification
+      if: failure()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: ❌ Volume Shocker FNO Failed - ${{ github.run_number }}
+        to: ${{ secrets.NOTIFICATION_EMAIL }}
+        from: GitHub Actions <github-actions@github.com>
+        body: |
+          Volume Shocker script failed at ${{ github.event.schedule }}.
+          
+          Check logs here: 
+          ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
