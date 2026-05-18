@@ -12,24 +12,20 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v6     # ← Updated to v6
+      uses: actions/checkout@v6
 
     - name: Setup Python
-      uses: actions/setup-python@v6 # ← Updated to v6
+      uses: actions/setup-python@v6
       with:
-        python-version: '3.12'
+        python-version: '3.11'
 
     - name: Install System Packages
-      run: sudo apt-get update && sudo apt-get install -y python3-dev
+      run: sudo apt-get update && sudo apt-get install -y python3-dev libxml2-dev libxslt1-dev
 
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip wheel setuptools
-        if [ -f requirements.txt ]; then 
-          pip install -r requirements.txt --no-cache-dir
-        else
-          echo "⚠️ No requirements.txt found!"
-        fi
+        pip install -r requirements.txt --no-cache-dir
 
     - name: Run Volume Shocker Script
       run: python Volume_Shocker_fno.py
