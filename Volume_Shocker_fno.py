@@ -11,37 +11,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 warnings.filterwarnings("ignore")
 
-# ==================== TIME CHECK FOR 3:15 PM IST EXECUTION ====================
-def is_execution_time():
-    """
-    Check if current time is within 2 minutes of 3:15 PM IST
-    This ensures the script only runs at exactly 3:15 PM IST
-    """
-    # IST is UTC+5:30
-    ist_offset = timedelta(hours=5, minutes=30)
-    ist_now = datetime.utcnow() + ist_offset
-    
-    target_hour = 15  # 3 PM
-    target_minute = 15
-    
-    # Check if time is between 3:14 PM and 3:16 PM IST
-    if ist_now.hour == target_hour and abs(ist_now.minute - target_minute) <= 1:
-        return True, ist_now
-    
-    return False, ist_now
-
-# Check execution time before proceeding
-should_run, current_ist = is_execution_time()
-if not should_run:
-    print(f"⏰ Skipping execution - Current IST: {current_ist.strftime('%H:%M:%S')}")
-    print(f"🎯 This script only runs at 3:15 PM IST (3:14-3:16 PM window)")
-    print(f"📅 Current time: {current_ist.strftime('%Y-%m-%d %H:%M:%S')} IST")
-    exit(0)  # Exit gracefully without running the main logic
-
-print(f"✅ Execution time verified: {current_ist.strftime('%H:%M:%S')} IST")
-print(f"🎯 Running BTST screener at exactly 3:15 PM IST")
-print("="*60)
-
 # ==================== TELEGRAM CONFIGURATION ====================
 # This will automatically use GitHub Secrets when running on GitHub Actions
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN') or "7770995517:AAFlM9YRAAckuKu7c-uBoR5_2srzj_uUzH8"
