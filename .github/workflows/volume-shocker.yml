@@ -3,7 +3,7 @@ name: Run Volume Shocker FNO
 on:
   schedule:
     - cron: '55 3 * * *'    # 9:25 AM IST
-    - cron: '45 9 * * *'    # 3:15 PM IST
+    - cron: '40 8 * * *'    # 3:15 PM IST
   workflow_dispatch:
 
 jobs:
