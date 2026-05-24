@@ -2,8 +2,8 @@ name: Run Volume Shocker FNO
 
 on:
   schedule:
-    - cron: '55 3 * * *'    # 9:25 AM IST
-    - cron: '45 9 * * *'    # 3:15 PM IST
+    - cron: '55 3 * * *'    # 9:25 AM IST (unchanged)
+    - cron: '40 8 * * *'    # 2:10 PM IST (8:40 UTC) - runs early to finish by 3:15 PM
   workflow_dispatch:
 
 jobs:
@@ -52,7 +52,7 @@ jobs:
       if: always()
       run: |
         if [ "${{ job.status }}" = "success" ]; then
-          MSG="✅ Volume Shocker FNO Success"
+          MSG="✅ Volume Shocker FNO Success - Results at 3:15 PM IST"
         else
           MSG="❌ Volume Shocker FNO Failed"
         fi
