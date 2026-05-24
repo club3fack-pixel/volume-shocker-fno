@@ -2,14 +2,8 @@ name: Run Volume Shocker FNO
 
 on:
   schedule:
-    # Adjusted cron to account for GitHub Actions ~36-minute delay
-    # Target: Execute at 3:15 PM IST
-    # Scheduled at 9:09 AM UTC (2:39 PM IST) -> actual execution ~3:15 PM IST
-    - cron: '09 9 * * *'
-    
-    # Backup schedule at 9:20 AM UTC in case of longer delays
-    - cron: '20 9 * * *'
-    
+    - cron: '55 3 * * *'    # 9:25 AM IST
+    - cron: '45 9 * * *'    # 3:15 PM IST
   workflow_dispatch:
 
 jobs:
@@ -18,10 +12,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4  # Stay on v4, don't force Node24
+      uses: actions/checkout@v6
 
     - name: Setup Python
-      uses: actions/setup-python@v5  # Stay on v5, don't force Node24
+      uses: actions/setup-python@v6
       with:
         python-version: '3.12'
 
